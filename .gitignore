@@ -1,3 +1,7 @@
 /test-classes/
 /.settings/
 /gwt-unitCache/
+*.yaml
+logger_bot/logger/logger
+logger_bot/logger/logger.exe
+*.exe
