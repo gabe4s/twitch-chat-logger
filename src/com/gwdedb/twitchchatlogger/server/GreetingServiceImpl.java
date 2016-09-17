@@ -2,6 +2,8 @@ package com.gwdedb.twitchchatlogger.server;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -9,6 +11,7 @@ import javax.sql.DataSource;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.gwdedb.twitchchatlogger.client.GreetingService;
+import com.gwdedb.twitchchatlogger.shared.ChatLog;
 
 /**
  * The server-side implementation of the RPC service.
@@ -36,5 +39,32 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		ps.setString(3, timestamp);
 		ps.setString(4, sender);
 		ps.executeUpdate();
+	}
+	
+	@Override
+	public ArrayList<String> getAllChannels() throws Exception {
+		ArrayList<String> channels = new ArrayList<String>();
+		String sql = "SELECT channel FROM chat_logs GROUP BY channel";
+		PreparedStatement ps = getConnection().prepareStatement(sql);
+		ResultSet rs = ps.executeQuery();
+		while(rs.next()) {
+			channels.add(rs.getString("channel"));
+			System.out.println(rs.getString("channel"));
+		}
+		
+		return channels;
+	}
+	
+	@Override
+	public ArrayList<ChatLog> getChatLogDataFromSearchCriteria() throws Exception {
+		ArrayList<ChatLog> chatLogs = new ArrayList<ChatLog>();
+		String sql = "SELECT * FROM chat_logs LIMIT 10";
+		PreparedStatement ps = getConnection().prepareStatement(sql);
+		ResultSet rs = ps.executeQuery();
+		while(rs.next()) {
+			chatLogs.add(new ChatLog(rs.getString("channel"), rs.getString("text"), rs.getString("timestamp"), rs.getString("sender")));
+		}
+
+		return chatLogs;
 	}
 }

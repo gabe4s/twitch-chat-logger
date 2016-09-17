@@ -13,7 +13,7 @@
   
   <servlet-mapping>
     <servlet-name>greetServlet</servlet-name>
-    <url-pattern>/tcl/greet</url-pattern>
+    <url-pattern>/twitchchatlogger/greet</url-pattern>
   </servlet-mapping>
   
     <servlet>
