@@ -1,2 +1,4 @@
 *.yaml
 logger_bot/logger/logger
+logger_bot/logger/logger.exe
+*.exe
