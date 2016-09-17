@@ -5,7 +5,7 @@ import (
 	"github.com/thoj/go-ircevent"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	//"net/http"
+	"net/http"
 	"net/url"
 	"time"
 	"twitch-chat-logger/logger_bot/ircutils"
@@ -42,14 +42,11 @@ func sendPostToServer(text, channel, sender string, msg_time time.Time, token st
 	values.Add("text", text)
 	values.Add("msg_time", msg_time.String())
 	values.Add("token", token)
-	/*
-		resp, err := http.PostForm("http://localhost:8000/tcl/log", values)
-		if err != nil {
-			fmt.Printf("Encountered error posting to server: %v\n", err)
-		}
-		defer resp.Body.Close()
-	*/
-	fmt.Println(values)
+	resp, err := http.PostForm("http://localhost:8080/tcl/log", values)
+	if err != nil {
+		fmt.Printf("Encountered error posting to server: %v\n", err)
+	}
+	defer resp.Body.Close()
 }
 
 func getCallback(con *irc.Connection, token string) func(*irc.Event) {
