@@ -8,6 +8,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -19,6 +20,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.datepicker.client.DateBox;
+import com.google.gwt.view.client.ListDataProvider;
 import com.gwdedb.twitchchatlogger.shared.ChatLog;
 
 public class ChatSearch {
@@ -28,15 +30,23 @@ public class ChatSearch {
 
 	public void init() {
 		RootPanel.get("rootPanel").add(mainVerticalPanel);
+
 		final CellTable<ChatLog> cellTable = new CellTable<ChatLog>();
+		cellTable.setPageSize(30);
+		cellTable.redrawFooters();
+		final ListDataProvider<ChatLog> dataProvider = new ListDataProvider<ChatLog>();
+		dataProvider.addDataDisplay(cellTable);
+	    final SimplePager pager = new SimplePager();
+	    pager.setDisplay(cellTable);
+	    
 		FlexTable searchFlexTable = new FlexTable();
 		Label startDateLabel = new Label("Start Date");
 		Label endDateLabel = new Label("End Date");
 		Label channelLabel = new Label("Channel");
 		Label searchTextLabel = new Label("Search Text");
 		
-		DateBox startDatePicker = new DateBox();
-		DateBox endDatePicker = new DateBox();
+		final DateBox startDatePicker = new DateBox();
+		final DateBox endDatePicker = new DateBox();
 		
 		final ListBox channelListBox = new ListBox();
 		channelListBox.addItem("ANY", "");
@@ -54,7 +64,7 @@ public class ChatSearch {
 				}
 			}});
 		
-		TextBox searchTextTextbox = new TextBox();
+		final TextBox searchTextTextbox = new TextBox();
 		
 		startDatePicker.setValue(new Date());
 		endDatePicker.setValue(new Date());
@@ -83,16 +93,25 @@ public class ChatSearch {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-			    getGreetingService().getChatLogDataFromSearchCriteria(new AsyncCallback<ArrayList<ChatLog>>() {
+			    getGreetingService().getChatLogDataFromSearchCriteria(
+			    		startDatePicker.getValue(), 
+			    		endDatePicker.getValue(), 
+			    		channelListBox.getSelectedValue(), 
+			    		searchTextTextbox.getValue(), 
+			    		new AsyncCallback<ArrayList<ChatLog>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						
+						Window.alert("Could not get chat logs at this time. Please try again..." + caught.getMessage());
 					}
 
 					@Override
 					public void onSuccess(ArrayList<ChatLog> result) {
-					    cellTable.setRowData(0, result);
+					    dataProvider.getList().clear();
+					    dataProvider.getList().addAll(result);
+					    dataProvider.flush();
+					    dataProvider.refresh();
+					    cellTable.redraw();
 					}});
 			}
 		});
@@ -131,8 +150,11 @@ public class ChatSearch {
 	      };
 	    cellTable.addColumn(senderColumn, "Sender");
 	    
+
+	    
 		getMainVerticalPanel().add(searchFlexTable);
 		getMainVerticalPanel().add(cellTable);
+		getMainVerticalPanel().add(pager);
 		
 	}
 
