@@ -61,7 +61,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 	public ArrayList<ChatLog> getChatLogDataFromSearchCriteria(String startDate, String endDate, String channel, String searchText) throws Exception {
 		ArrayList<ChatLog> chatLogs = new ArrayList<ChatLog>();
 		
-		String sql = "SELECT * FROM chat_logs WHERE (timestamp>=? AND timestamp<=?) OR timestamp like ?";
+		String sql = "SELECT * FROM chat_logs WHERE ((timestamp>=? AND timestamp<=?) OR timestamp like ?)";
 		
 		if(channel != null && channel.trim().length() > 0) {
 			sql += " AND channel=?";
