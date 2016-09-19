@@ -16,7 +16,7 @@
     <url-pattern>/twitchchatlogger/greet</url-pattern>
   </servlet-mapping>
   
-    <servlet>
+  <servlet>
     <servlet-name>postServlet</servlet-name>
     <servlet-class>com.gwdedb.twitchchatlogger.server.servlet.LogChatServlet</servlet-class>
   </servlet>
@@ -25,7 +25,17 @@
     <servlet-name>postServlet</servlet-name>
     <url-pattern>/log</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>channelAndDateServlet</servlet-name>
+    <servlet-class>com.gwdedb.twitchchatlogger.server.servlet.ChannelAndDateServlet</servlet-class>
+  </servlet>
   
+  <servlet-mapping>
+    <servlet-name>channelAndDateServlet</servlet-name>
+    <url-pattern>/channel/*/*</url-pattern>
+  </servlet-mapping>
+
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>TwitchChatLogger.html</welcome-file>

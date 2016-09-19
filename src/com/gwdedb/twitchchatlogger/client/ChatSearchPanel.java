@@ -12,27 +12,65 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.view.client.ListDataProvider;
 import com.gwdedb.twitchchatlogger.shared.ChatLog;
 
-public class ChatSearch {
+public class ChatSearchPanel extends BasePanel {
 	
-	private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
-	VerticalPanel mainVerticalPanel = new VerticalPanel();
+	private final LoadingPopup loadingPopup = new LoadingPopup();
 
+	public ChatSearchPanel() {
+		super();
+	}
+	
 	public void init() {
-		RootPanel.get("rootPanel").add(mainVerticalPanel);
+		loadingPopup.show();
+		getGreetingService().getAllChannels( new AsyncCallback<ArrayList<String>>() {
 
-		final CellTable<ChatLog> cellTable = new CellTable<ChatLog>();
-		cellTable.setPageSize(30);
+			@Override
+			public void onFailure(Throwable caught) {
+				loadingPopup.hide();
+				Window.alert("Could not get channels. Please try again...");
+			}
+
+			@Override
+			public void onSuccess(ArrayList<String> result) {
+				loadingPopup.hide();
+				drawUI(result);
+			}});
+	}
+
+	private void drawUI(ArrayList<String> channelList) {
+		Label channelHeader = new Label("Channel");
+		channelHeader.addStyleName("headerLabel");
+		final ListBox channelListBox = new ListBox();
+		channelListBox.setStyleName("inputBox");
+		channelListBox.addItem("ANY", "");
+		getMainVerticalPanel().add(channelHeader);
+		for(final String channel : channelList) {
+			channelListBox.addItem(channel);
+			Anchor anchor = new Anchor(channel);
+			anchor.addStyleName("marginLeft20");
+			anchor.addClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					String redirectURL = GWT.getHostPageBaseURL() + "?channel=" + channel;
+					Window.Location.replace(redirectURL);
+				}
+			});
+			getMainVerticalPanel().add(anchor);
+		}
+		CellTable.Resources tableRes = GWT.create(TableRes.class);
+		final CellTable<ChatLog> cellTable = new CellTable<ChatLog>(30, tableRes);
+		cellTable.addStyleName("cellTable");
 		cellTable.redrawFooters();
 		final ListDataProvider<ChatLog> dataProvider = new ListDataProvider<ChatLog>();
 		dataProvider.addDataDisplay(cellTable);
@@ -40,37 +78,29 @@ public class ChatSearch {
 	    pager.setDisplay(cellTable);
 	    
 		FlexTable searchFlexTable = new FlexTable();
+		searchFlexTable.addStyleName("searchFlexTable");
 		Label startDateLabel = new Label("Start Date");
+		startDateLabel.addStyleName("tableLabel");
 		Label endDateLabel = new Label("End Date");
+		endDateLabel.addStyleName("tableLabel");
 		Label channelLabel = new Label("Channel");
+		channelLabel.addStyleName("tableLabel");
 		Label searchTextLabel = new Label("Search Text");
+		searchTextLabel.addStyleName("tableLabel");
 		
 		final DateBox startDatePicker = new DateBox();
+		startDatePicker.setStyleName("inputBox");
 		final DateBox endDatePicker = new DateBox();
-		
-		final ListBox channelListBox = new ListBox();
-		channelListBox.addItem("ANY", "");
-		getGreetingService().getAllChannels( new AsyncCallback<ArrayList<String>>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("Could not get channels. Please try again...");
-			}
-
-			@Override
-			public void onSuccess(ArrayList<String> result) {
-				for(String channel : result) {
-					channelListBox.addItem(channel);
-				}
-			}});
+		endDatePicker.setStyleName("inputBox");
 		
 		final TextBox searchTextTextbox = new TextBox();
+		searchTextTextbox.setStyleName("inputBox");
 		
 		startDatePicker.setValue(new Date());
 		endDatePicker.setValue(new Date());
 		
-		startDatePicker.setFormat(new DateBox.DefaultFormat(DateTimeFormat.getFormat("MM/dd/yyyy")));
-		endDatePicker.setFormat(new DateBox.DefaultFormat(DateTimeFormat.getFormat("MM/dd/yyyy")));
+		startDatePicker.setFormat(new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd")));
+		endDatePicker.setFormat(new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd")));
 		
 		int row=0;
 		int column=0;
@@ -89,24 +119,28 @@ public class ChatSearch {
 		searchFlexTable.setWidget(row, column++, searchTextTextbox);
 		
 		Button searchButton = new Button("Search");
+		searchButton.setStyleName("searchButton");
 		searchButton.addClickHandler(new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
+				loadingPopup.show();
 			    getGreetingService().getChatLogDataFromSearchCriteria(
-			    		startDatePicker.getValue(), 
-			    		endDatePicker.getValue(), 
+			    		startDatePicker.getTextBox().getText(), 
+			    		endDatePicker.getTextBox().getText(), 
 			    		channelListBox.getSelectedValue(), 
 			    		searchTextTextbox.getValue(), 
 			    		new AsyncCallback<ArrayList<ChatLog>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
+						loadingPopup.hide();
 						Window.alert("Could not get chat logs at this time. Please try again..." + caught.getMessage());
 					}
 
 					@Override
 					public void onSuccess(ArrayList<ChatLog> result) {
+			    		loadingPopup.hide();
 					    dataProvider.getList().clear();
 					    dataProvider.getList().addAll(result);
 					    dataProvider.flush();
@@ -126,14 +160,6 @@ public class ChatSearch {
 	      };
 	    cellTable.addColumn(channelColumn, "Channel");
 	      
-	    TextColumn<ChatLog> textColumn = new TextColumn<ChatLog>() {
-	        @Override
-	        public String getValue(ChatLog chatLog) {
-	          return chatLog.getText();
-	        }
-	      };
-	    cellTable.addColumn(textColumn, "Text");
-	    
 	    TextColumn<ChatLog> timestampColumn = new TextColumn<ChatLog>() {
 	        @Override
 	        public String getValue(ChatLog chatLog) {
@@ -150,7 +176,13 @@ public class ChatSearch {
 	      };
 	    cellTable.addColumn(senderColumn, "Sender");
 	    
-
+	    TextColumn<ChatLog> textColumn = new TextColumn<ChatLog>() {
+	        @Override
+	        public String getValue(ChatLog chatLog) {
+	          return chatLog.getText();
+	        }
+	      };
+	    cellTable.addColumn(textColumn, "Text");
 	    
 		getMainVerticalPanel().add(searchFlexTable);
 		getMainVerticalPanel().add(cellTable);
@@ -158,11 +190,4 @@ public class ChatSearch {
 		
 	}
 
-	public GreetingServiceAsync getGreetingService() {
-		return greetingService;
-	}
-	
-	private VerticalPanel getMainVerticalPanel() {
-		return mainVerticalPanel;
-	}
 }
