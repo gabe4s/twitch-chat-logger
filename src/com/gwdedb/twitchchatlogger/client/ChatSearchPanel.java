@@ -69,7 +69,7 @@ public class ChatSearchPanel extends BasePanel {
 			getMainVerticalPanel().add(anchor);
 		}
 		CellTable.Resources tableRes = GWT.create(TableRes.class);
-		final CellTable<ChatLog> cellTable = new CellTable<ChatLog>(30, tableRes);
+		final CellTable<ChatLog> cellTable = new CellTable<ChatLog>(25, tableRes);
 		cellTable.addStyleName("cellTable");
 		cellTable.redrawFooters();
 		final ListDataProvider<ChatLog> dataProvider = new ListDataProvider<ChatLog>();
