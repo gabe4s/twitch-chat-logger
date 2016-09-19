@@ -22,13 +22,10 @@ import com.gwdedb.twitchchatlogger.shared.ChatLog;
 @SuppressWarnings("serial")
 public class GreetingServiceImpl extends RemoteServiceServlet implements GreetingService {
 	
-	private static Connection conn = null;
-	private static Connection getConnection() throws Exception {
-		if(conn == null) {
-	        Context ctx = new InitialContext();
-	        DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/twitchloggerDS");
-	        conn = ds.getConnection();
-		}
+	private  Connection getNewConnection() throws Exception {
+	    Context ctx = new InitialContext();
+	    DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/twitchloggerDS");
+	    Connection conn = ds.getConnection();
  
         return conn;
 	}
@@ -36,24 +33,29 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 
 	public void savePostToDatabase(String channel, String text, String timestamp, String sender) throws Exception {
 		String sql = "INSERT INTO chat_logs (channel, text, timestamp, sender) VALUES (?, ?, ?, ?)";
-		PreparedStatement ps = getConnection().prepareStatement(sql);
+		Connection conn = getNewConnection();
+		PreparedStatement ps = conn.prepareStatement(sql);
 		ps.setString(1, channel);
 		ps.setString(2, text);
 		ps.setString(3, timestamp);
 		ps.setString(4, sender);
 		ps.executeUpdate();
+		
+		conn.close();
 	}
 	
 	@Override
 	public ArrayList<String> getAllChannels() throws Exception {
 		ArrayList<String> channels = new ArrayList<String>();
 		String sql = "SELECT channel FROM chat_logs GROUP BY channel";
-		PreparedStatement ps = getConnection().prepareStatement(sql);
+		Connection conn = getNewConnection();
+		PreparedStatement ps = conn.prepareStatement(sql);
 		ResultSet rs = ps.executeQuery();
 		while(rs.next()) {
 			channels.add(rs.getString("channel"));
 		}
-		
+		conn.close();
+
 		return channels;
 	}
 	
@@ -74,7 +76,8 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		sql += " ORDER BY timestamp";
 		
 		int psIndex = 1;
-		PreparedStatement ps = getConnection().prepareStatement(sql);
+		Connection conn = getNewConnection();
+		PreparedStatement ps = conn.prepareStatement(sql);
 		ps.setString(psIndex++, startDate);
 		ps.setString(psIndex++, endDate);
 		ps.setString(psIndex++, endDate + "%");
@@ -91,6 +94,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		while(rs.next()) {
 			chatLogs.add(new ChatLog(rs.getString("channel"), rs.getString("text"), rs.getString("timestamp"), rs.getString("sender")));
 		}
+		conn.close();
 
 		return chatLogs;
 	}
@@ -99,7 +103,8 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 	public LinkedHashMap<String, String> getDaysAndCountForChannel(String channel) throws Exception {
 		LinkedHashMap<String, String> dayCountMap = new LinkedHashMap<String, String>();
 		String sql = "SELECT count(*) as count, timestamp FROM chat_logs WHERE channel=? GROUP BY CAST(timestamp AS DATE) ORDER BY timestamp DESC";
-		PreparedStatement ps = getConnection().prepareStatement(sql);
+		Connection conn = getNewConnection();
+		PreparedStatement ps = conn.prepareStatement(sql);
 		ps.setString(1, channel);
 		
 		ResultSet rs = ps.executeQuery();
@@ -107,7 +112,8 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 			String day = rs.getString("timestamp").split(" ")[0];
 			dayCountMap.put(day, rs.getString("count"));
 		}
-		
+		conn.close();
+
 		return dayCountMap;
 	}
 	
@@ -115,7 +121,8 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 	public ArrayList<ChatLog> getChatLogsForChannelAndDate(String channel, String date) throws Exception {
 		ArrayList<ChatLog> chatLogs = new ArrayList<ChatLog>();
 		String sql = "SELECT * FROM chat_logs WHERE channel=? AND timestamp LIKE ? ORDER BY timestamp";
-		PreparedStatement ps = getConnection().prepareStatement(sql);
+		Connection conn = getNewConnection();
+		PreparedStatement ps = conn.prepareStatement(sql);
 		ps.setString(1, channel);
 		ps.setString(2, date + "%");
 		
@@ -123,6 +130,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		while(rs.next()) {
 			chatLogs.add(new ChatLog(rs.getString("channel"), rs.getString("text"), rs.getString("timestamp").split(" ")[1], rs.getString("sender")));
 		}
+		conn.close();
 		
 		return chatLogs;
 	}
