@@ -32,3 +32,77 @@ h1 {
 #closeButton {
   margin: 15px 6px 6px;
 }
+
+.headerLabel {
+	font-size: 18pt;
+	padding-bottom: 10px;
+	color: #45565C;
+	font-weight: bold;
+	padding-top: 25px;
+}
+
+.timestampSenderLabel {
+	width: 225px;
+}
+
+.marginLeft20 {
+	margin-left: 20px;
+}
+
+.marginLeft10 {
+	margin-left: 10px;
+}
+
+.inputBox, gwt-DateBox, gwt-TextBox {
+	width: 200px;
+	height: 20px;
+	padding: 5px 15px;;
+	border: none;
+	border-bottom: 3px solid #45565C;
+	border-radius: 30px;
+	-moz-box-sizing: content-box; /* or `border-box` */
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+.searchFlexTable {
+	margin: auto;
+	margin-top: 70px;
+}
+
+.tableLabel {
+	font-size: 13pt;
+	font-weight: bold;
+}
+
+.cellTable {
+	width: 100%;
+}
+
+.mainVerticalpanel {
+	width: 100%;
+}
+
+.searchButton {
+	width: 125px;
+	font-weight: bold;
+	height: 20px;
+	padding: 5px;
+	-moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+    border-radius: 14px;
+    border: 0px solid #777777;
+    border-bottom: 3px solid #45565C;
+    border-top: 3px solid #45565C;
+    background-color: white;
+}
+
+.homeAnchor, .homeAnchor:visited, .homeAnchor:hover {
+	font-weight: bold;
+	font-size: 14pt;
+	border-bottom: 2px solid #45565C;
+	color: #6e8891;
+	margin-bottom: 25px;
+}
