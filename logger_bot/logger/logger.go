@@ -5,6 +5,7 @@ import (
 	"github.com/thoj/go-ircevent"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"net/url"
 	"strings"
@@ -43,15 +44,23 @@ func sendPostToServer(text, channel, sender string, msg_time time.Time, token st
 	values.Add("text", text)
 	values.Add("msg_time", msg_time.String())
 	values.Add("token", token)
-	resp, err := http.PostForm("http://example.com/log", values)
+	defer func() {
+		r := recover()
+		if r != nil {
+			fmt.Println("Recovered due to some error: ", r)
+		}
+	}()
+	resp, err := http.PostForm("http://tlogs.site/log", values)
+	fmt.Println("Posted. Resp:", resp.Status, text[:int(math.Min(float64(40), float64(len(text))))])
 	if err != nil {
 		fmt.Printf("Encountered error posting to server: %v\n", err)
+	} else {
+		defer resp.Body.Close()
 	}
-	defer resp.Body.Close()
 }
 
 func giveURL(con *irc.Connection, channel string) {
-	con.Privmsg("#"+channel, "http://example.com/"+channel)
+	con.Privmsg("#"+channel, "http://tlogs.site/"+channel)
 }
 
 func getCallback(con *irc.Connection, token string) func(*irc.Event) {
@@ -70,6 +79,7 @@ func getCallback(con *irc.Connection, token string) func(*irc.Event) {
 }
 
 func main() {
+	fmt.Println("%v\n", time.Now())
 	settings := getSettings()
 	con := ircutils.GetConnection(
 		settings.Server,
