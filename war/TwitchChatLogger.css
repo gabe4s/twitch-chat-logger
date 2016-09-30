@@ -59,12 +59,13 @@ h1 {
 	padding: 5px 15px;;
 	border: none;
 	border-bottom: 3px solid #45565C;
-	border-radius: 30px;
+	border-radius: 5px;
 	-moz-box-sizing: content-box; /* or `border-box` */
     -webkit-box-sizing: content-box;
     box-sizing: content-box;
 	margin-left: 10px;
 	margin-right: 10px;
+	background-color: #f0f3f4;
 }
 .searchFlexTable {
 	margin: auto;
@@ -92,11 +93,15 @@ h1 {
 	-moz-box-sizing: content-box;
     -webkit-box-sizing: content-box;
     box-sizing: content-box;
-    border-radius: 14px;
+    border-radius: 5px;
     border: 0px solid #777777;
     border-bottom: 3px solid #45565C;
     border-top: 3px solid #45565C;
-    background-color: white;
+    background-color: #f0f3f4;
+}
+
+.searchButton:hover {
+	background-color: #b6c3c8;
 }
 
 .homeAnchor, .homeAnchor:visited, .homeAnchor:hover {

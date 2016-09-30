@@ -22,30 +22,34 @@ public class LogChatServlet extends HttpServlet
 	private static final String AUTHENTICATION_TOKEN = ConfigValues.getProperty("AUTHENTICATION_TOKEN");
 	
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String channel = request.getParameter("channel");
-        String text = request.getParameter("text");
-        String timestamp = request.getParameter("msg_time");
-        String sender = request.getParameter("sender");
-        String token = request.getParameter("token");
-
-        System.out.println("POST received: " + channel + ":" + text + ":" + timestamp + ":" + sender + ":" + token);
-        
-        String regexPattern = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}";
-        Pattern p = Pattern.compile(regexPattern);
-        Matcher m = p.matcher(timestamp);
-        if (m.find( )) {
-        	System.out.println("Found value: " + m.group(0));
-        	timestamp = m.group(0);
-        }
-
-        if(AUTHENTICATION_TOKEN.equals(token)) {
-        	try {
-				getService().savePostToDatabase(channel, text, timestamp, sender);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-        }
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+    	try {
+	        String channel = request.getParameter("channel");
+	        String text = request.getParameter("text");
+	        String timestamp = request.getParameter("msg_time");
+	        String sender = request.getParameter("sender");
+	        String token = request.getParameter("token");
+	
+	        System.out.println("POST received: " + channel + ":" + text + ":" + timestamp + ":" + sender + ":" + token);
+	        
+	        String regexPattern = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}";
+	        Pattern p = Pattern.compile(regexPattern);
+	        Matcher m = p.matcher(timestamp);
+	        if (m.find( )) {
+	        	timestamp = m.group(0);
+	        }
+	
+	        if(AUTHENTICATION_TOKEN.equals(token)) {
+	        	try {
+					getService().savePostToDatabase(channel, text, timestamp, sender);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+	        }
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		System.err.println(e.getMessage());
+    	}
     }
 
     private GreetingServiceImpl getService() {
