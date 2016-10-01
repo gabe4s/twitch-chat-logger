@@ -6,7 +6,7 @@ import java.util.Properties;
 
 public class ConfigValues {
 
-	private static final File CONFIG_FILE = new File(System.getProperty("user.home") + "/loggerconfig/config.properties");
+	private static final File CONFIG_FILE = new File("/home/ubuntu/loggerconfig/config.properties");
 	private static Properties properties = null;
 	
 	public static String getProperty(String key) {
