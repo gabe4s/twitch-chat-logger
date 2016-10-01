@@ -26,15 +26,17 @@
     <url-pattern>/log</url-pattern>
   </servlet-mapping>
 
+
   <servlet>
-    <servlet-name>channelAndDateServlet</servlet-name>
-    <servlet-class>com.gwdedb.twitchchatlogger.server.servlet.ChannelAndDateServlet</servlet-class>
+    <servlet-name>channelServlet</servlet-name>
+    <servlet-class>com.gwdedb.twitchchatlogger.server.servlet.ChannelServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
-    <servlet-name>channelAndDateServlet</servlet-name>
-    <url-pattern>/channel/*/*</url-pattern>
+    <servlet-name>channelServlet</servlet-name>
+    <url-pattern>/*</url-pattern>
   </servlet-mapping>
+  
 
   <!-- Default page to serve -->
   <welcome-file-list>
