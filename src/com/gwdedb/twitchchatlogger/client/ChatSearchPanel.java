@@ -58,14 +58,7 @@ public class ChatSearchPanel extends BasePanel {
 			channelListBox.addItem(channel);
 			Anchor anchor = new Anchor(channel);
 			anchor.addStyleName("marginLeft20");
-			anchor.addClickHandler(new ClickHandler() {
-				
-				@Override
-				public void onClick(ClickEvent event) {
-					String redirectURL = GWT.getHostPageBaseURL() + "?channel=" + channel;
-					Window.Location.replace(redirectURL);
-				}
-			});
+			anchor.setHref("/channel/" + channel);
 			getMainVerticalPanel().add(anchor);
 		}
 		CellTable.Resources tableRes = GWT.create(TableRes.class);

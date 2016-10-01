@@ -34,7 +34,7 @@
   
   <servlet-mapping>
     <servlet-name>channelServlet</servlet-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/channel/*</url-pattern>
   </servlet-mapping>
   
 
