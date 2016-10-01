@@ -27,15 +27,17 @@ public class ChannelServlet extends HttpServlet{
 		sb.append("Logs - " + channel);
 		sb.append("</title>\n");
 		sb.append("<style>\n");
-		sb.append("h1 {color: #45565C;}\n");
+		sb.append("a:visited {color: blue;}\n");
+		sb.append("h2 {color: #45565C;}\n");
 		sb.append("p {margin:0px 0px 0px 10px;padding:0;font-size:14px;font-weight:normal;border-collapse:collapse;border-spacing:0px;}\n");
 		sb.append("anchor {}\n");
 		sb.append("</style>\n");
 		sb.append("</head>\n");
 		sb.append("<body>\n");
-		sb.append("<h1>");
-		sb.append("Logs By Day For " + channel);
-		sb.append("</h1>\n");
+		sb.append("<h3>[<a href=\"/\">Home</a>]</h3>");
+		sb.append("<h2>");
+		sb.append("Logs by day for " + channel);
+		sb.append("</h2>\n");
 		try {
 			LinkedHashMap<String, String> dateCount = gsi.getDaysAndCountForChannel(channel);
 			for(Map.Entry<String, String> entry : dateCount.entrySet()) {
@@ -60,21 +62,26 @@ public class ChannelServlet extends HttpServlet{
 		sb.append("</title>\n");
 		sb.append("<style>\n");
 		sb.append("body {background-color:#ffffff;}\n");
-		sb.append("h1 {color: #45565C;}\n");
+		sb.append("h2 {color: #45565C;}\n");
+		sb.append("a:visited {color: blue;}\n");
+		sb.append(":target { background-color: #ffa; -webkit-transition: all 1s linear; }");
 		sb.append("table,tr,td {margin:0;padding:0;font-size:14px;font-weight:normal;border-collapse:collapse;border-spacing:0px;}\n");
 		sb.append("table {margin:0px 0px 0px 10px;}\n");
 		sb.append(".col1 {width:300px;}\n");
 		sb.append("</style>\n");
 		sb.append("</head>\n");
 		sb.append("<body>\n");
-		sb.append("<h1>");
-		sb.append("Logs For " + channel + " On " + day);
-		sb.append("</h1>\n");
+		sb.append("<h3>[<a href=\"/\">Home</a>]</h3>");
+		sb.append("<h2>");
+		sb.append("Logs for <a href=\"/channel/monotonetim\">" + channel + "</a> on " + day);
+		sb.append("</h2>\n");
 		sb.append("<table>\n");
 		try {
 			ArrayList<ChatLog> chatLogs = gsi.getChatLogsForChannelAndDate(channel, day);
+			int count = 0;
 			for(ChatLog chatLog : chatLogs) {
-				sb.append("<tr><td class=\"col1\">[" + chatLog.getTimestamp() + "]&nbsp;" + chatLog.getSender() + "</td><td class=\"col2\">" + chatLog.getText() + "</td></tr>\n");
+				sb.append("<tr id=\""+count+"\"><td class=\"col1\"><a href=\"#"+count+"\">[" + chatLog.getTimestamp() + "]</a>&nbsp;" + chatLog.getSender() + "</td><td class=\"col2\">" + chatLog.getText() + "</td></tr>\n");
+				count += 1;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
