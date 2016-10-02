@@ -30,7 +30,9 @@ public class ChannelServlet extends HttpServlet{
 		sb.append("a:visited {color: blue;}\n");
 		sb.append("h2 {color: #45565C;}\n");
 		sb.append("p {margin:0px 0px 0px 10px;padding:0;font-size:14px;font-weight:normal;border-collapse:collapse;border-spacing:0px;}\n");
-		sb.append("anchor {}\n");
+		sb.append(".anchor, .wrapper {float: left;}\n");
+		sb.append(".wrapper {flex: 1; padding-left: 1em;}\n");
+		sb.append(".count {background-color: #99F; margin-bottom: 0.3em; display: inherit;}\n");
 		sb.append("</style>\n");
 		sb.append("</head>\n");
 		sb.append("<body>\n");
@@ -40,10 +42,21 @@ public class ChannelServlet extends HttpServlet{
 		sb.append("</h2>\n");
 		try {
 			LinkedHashMap<String, String> dateCount = gsi.getDaysAndCountForChannel(channel);
+			int largest_count = 0;
+			int count = 0;
+			double percent_width = 0;
+			for(Map.Entry<String, String> entry : dateCount.entrySet()) {
+				count = Integer.parseInt(entry.getValue());
+				if (count > largest_count) {
+					largest_count = count;
+				}
+			}
 			for(Map.Entry<String, String> entry : dateCount.entrySet()) {
 			    String date = entry.getKey();
-			    String count = entry.getValue();
-			    sb.append("<p><a class=\"anchor\" href=\"/channel/" + channel + "/" + date + "\">" + date + "</a> : " + count + "</p>\n");
+			    String count_str = entry.getValue();
+			    count = Integer.parseInt(count_str);
+			    percent_width = 100.0 * (count + 0.0) / largest_count;
+			    sb.append("<div style=\"display: flex;\"><span class=\"anchor\"><a href=\"/channel/" + channel + "/" + date + "\">" + date + "</a>: </span> <span class=\"wrapper\"><span class=\"count\" style=\"width:"+percent_width+"%\"> " + count_str + "</span></span></div>\n");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
